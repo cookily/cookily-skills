@@ -1,6 +1,6 @@
 ---
-name: graphify-windows
-description: any input (code, docs, papers, images) → knowledge graph → clustered communities → HTML + JSON + audit report
+name: graphify
+description: 知识图谱生成器——将任意文件夹（代码、文档、论文、笔记、图片）转化为可交互的知识图谱，自动发现文件间关联，支持社区聚类和多种格式导出。
 trigger: /graphify
 ---
 

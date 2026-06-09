@@ -1,6 +1,6 @@
 ---
 name: compile
-description: Use when organizing raw files from raw/ into summaries and concepts in a knowledge base. Triggers after ingesting new articles, notes, or external content that needs to be compiled into structured knowledge.
+description: 知识库编译器——将 raw/ 中的杂乱资料编译成结构化摘要和概念卡片，自动更新索引和交叉链接。适用场景：导入新文章/笔记后触发编译。
 ---
 
 # 知识库编译流程
