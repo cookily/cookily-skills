@@ -1,11 +1,11 @@
-# cookily/skills
+# cookily/cookily-skills
 
 个人 AI 技能库。一行命令装到任意 Agent，跨 Claude Code / Codex / Hermes / Cursor 通用。
 
 ## 安装
 
 ```bash
-npx skills add https://github.com/cookily/skills
+npx skills add https://github.com/cookily/cookily-skills
 ```
 
 ## 包含技能
@@ -70,7 +70,7 @@ skills/
 
 然后重新安装即可获取新技能：
 ```bash
-npx skills add https://github.com/cookily/skills
+npx skills add https://github.com/cookily/cookily-skills
 ```
 
 ## License
