@@ -1,78 +1,27 @@
-# cookily/cookily-skills
+# cookily-skills
 
-个人 AI 技能库。一行命令装到任意 Agent，跨 Claude Code / Codex / Hermes / Cursor 通用。
+个人提炼的 Claude Code Skills，用于 AI 编程工作流和知识库管理。
 
 ## 安装
 
 ```bash
-npx skills add https://github.com/cookily/cookily-skills
+# 克隆仓库
+git clone https://github.com/cookily/cookily-skills.git
+
+# 安装到全局 skills 目录
+cp -r skills/* ~/.claude/skills/
 ```
 
-## 包含技能
+## Skills
 
-| 技能 | 触发 | 做什么 |
-|------|------|--------|
-| **compile** | `/compile` | 把 `raw/` 里的杂乱资料编译成结构化知识库（摘要+概念+索引） |
-| **graphify** | `/graphify` | 把任意文件夹变成知识图谱，自动发现文件间的关系 |
+| Skill | 用途 | 触发方式 |
+|-------|------|---------|
+| **compile** | Obsidian 知识库编译（raw/ → wiki/） | `/compile` |
+| **flow-select** | 新任务启动时选择工作流 | 新任务自动触发 |
+| **graphify** | 知识图谱生成 | `/graphify` |
 
-## 使用
+## 注意事项
 
-### /compile
-
-把文章丢进 `raw/`，输入 `/compile`，自动：
-
-- 扫描未编译文件
-- 生成一句话摘要 + 核心要点
-- 方法论类文章自动提取概念卡片
-- 更新索引，建立交叉链接
-
-```bash
-/compile
-```
-
-### /graphify
-
-把文件夹变成交互式知识图谱：
-
-```bash
-/graphify                    # 当前目录全量扫描
-/graphify raw/               # 只处理 raw 文件
-/graphify . --graphml        # 导出 GraphML 格式
-/graphify . --update         # 增量更新（只处理新文件）
-/graphify . --mode deep      # 深度提取，更丰富的关联
-```
-
-输出：交互式 HTML 图谱 + JSON 数据 + 社区聚类 + 审计报告。
-
-## 两个技能怎么配合
-
-```
-你随手丢一篇文章进 raw/
-       ↓
-   /compile    ← 提炼（文章 → 摘要 + 概念）
-       ↓
-   /graphify   ← 连接（散点 → 知识网络）
-```
-
-## 添加新技能
-
-在 `skills/` 下新建文件夹，放一个 `SKILL.md` 即可：
-
-```
-skills/
-├── compile/
-│   └── SKILL.md
-├── graphify/
-│   └── SKILL.md
-└── your-new-skill/
-    └── SKILL.md
-```
-
-然后重新安装即可获取新技能：
-```bash
-npx skills add https://github.com/cookily/cookily-skills
-```
-
-## License
-
-MIT
+- `compile` 附带 `compiled-manifest.py` 和 `_populate_manifest.py`，安装后复制到知识库项目根目录使用
+- `flow-select` 为全局 skill，任何项目新任务都会触发
+- 所有 git push 需用户确认（全局 pre-push hook 拦截）
