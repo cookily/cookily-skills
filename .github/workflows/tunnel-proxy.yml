@@ -14,14 +14,14 @@ jobs:
           echo "${{ secrets.ALIYUN_SSH_PRIV }}" > ~/.ssh/aliyun_tunnel_key
           chmod 600 ~/.ssh/aliyun_tunnel_key
           cat > ~/.ssh/config << EOF
-Host tunnel
-  HostName ${{ secrets.ALIYUN_IP }}
-  User ${{ secrets.ALIYUN_USER }}
-  Port ${{ secrets.ALIYUN_SSH_PORT }}
-  IdentityFile ~/.ssh/aliyun_tunnel_key
-  StrictHostKeyChecking no
-  ServerAliveInterval 60
-EOF
+            Host tunnel
+              HostName ${{ secrets.ALIYUN_IP }}
+              User ${{ secrets.ALIYUN_USER }}
+              Port ${{ secrets.ALIYUN_SSH_PORT }}
+              IdentityFile ~/.ssh/aliyun_tunnel_key
+              StrictHostKeyChecking no
+              ServerAliveInterval 60
+          EOF
           chmod 644 ~/.ssh/config
 
       - name: 启动反向SOCKS隧道
