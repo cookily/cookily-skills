@@ -1,0 +1,31 @@
+name: 代理跳板
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '50 */5 * * *'
+jobs:
+  proxy-tunnel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: 配置SSH私钥连接腾讯云
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ALIYUN_SSH_PRIV }}" > ~/.ssh/aliyun_tunnel_key
+          chmod 600 ~/.ssh/aliyun_tunnel_key
+          cat > ~/.ssh/config << EOF
+Host tunnel
+  HostName ${{ secrets.ALIYUN_IP }}
+  User ${{ secrets.ALIYUN_USER }}
+  Port ${{ secrets.ALIYUN_SSH_PORT }}
+  IdentityFile ~/.ssh/aliyun_tunnel_key
+  StrictHostKeyChecking no
+  ServerAliveInterval 60
+EOF
+          chmod 644 ~/.ssh/config
+
+      - name: 启动反向SOCKS隧道
+        run: |
+          ssh -Nf -D 9999 -R 10800:127.0.0.1:9999 tunnel
+          echo "隧道就绪，腾讯云代理地址 socks5h://127.0.0.1:10800"
+          sleep 21600
