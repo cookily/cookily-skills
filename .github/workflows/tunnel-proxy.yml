@@ -26,22 +26,20 @@ jobs:
           EOF
           chmod 644 ~/.ssh/config
 
-      - name: 启动【正向+精准反向】SOCKS隧道
+      - name: 启动【真正反向全局代理】腾讯云走GitHub海外IP
         run: |
-          # -D 9999 ：GitHub本机海外SOCKS（出口GitHub美国IP）
-          # -R 127.0.0.1:10800:127.0.0.1:9999 ：强制映射到腾讯云本地10800
+          # 核心关键：在腾讯云远端开启SOCKS，出口为GitHub网络
           ssh -N \
             -o ServerAliveInterval=30 \
             -o ServerAliveCountMax=3 \
             -o ExitOnForwardFailure=yes \
-            -D 9999 \
-            -R 127.0.0.1:10800:127.0.0.1:9999 \
+            -R 127.0.0.1:10800:0.0.0.0:0 \
             tunnel &
 
           sleep 3
-          echo "✅ 隧道启动成功！"
-          echo "👉 腾讯云代理地址：socks5://127.0.0.1:10800"
-          echo "🌐 出口IP为 GitHub Action 海外机房IP"
-          
-          # 前台挂起保活6小时（替代sleep，更稳定）
+          echo "✅ 真正反向代理启动成功"
+          echo "✅ 腾讯云所有流量将从GitHub美国IP出口"
+          echo "👉 代理：socks5://127.0.0.1:10800"
+
+          # 保活6小时
           timeout 21600 sleep 99999
