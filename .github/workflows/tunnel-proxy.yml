@@ -2,30 +2,46 @@ name: 代理跳板
 on:
   workflow_dispatch:
   schedule:
-    - cron: '50 */5 * * *'
+    - cron: '50 */5 * * *' # 每5小时自动续期，规避6小时超时
+
 jobs:
   proxy-tunnel:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 360 # 最大6小时保活
     steps:
-      - name: 配置SSH私钥连接腾讯云
+      - name: 配置SSH免密连接腾讯云
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.ALIYUN_SSH_PRIV }}" > ~/.ssh/aliyun_tunnel_key
           chmod 600 ~/.ssh/aliyun_tunnel_key
           cat > ~/.ssh/config << EOF
-            Host tunnel
-              HostName ${{ secrets.ALIYUN_IP }}
-              User ${{ secrets.ALIYUN_USER }}
-              Port ${{ secrets.ALIYUN_SSH_PORT }}
-              IdentityFile ~/.ssh/aliyun_tunnel_key
-              StrictHostKeyChecking no
-              ServerAliveInterval 60
+          Host tunnel
+            HostName ${{ secrets.ALIYUN_IP }}
+            User ${{ secrets.ALIYUN_USER }}
+            Port ${{ secrets.ALIYUN_SSH_PORT }}
+            IdentityFile ~/.ssh/aliyun_tunnel_key
+            StrictHostKeyChecking no
+            ServerAliveInterval 30
+            ServerAliveCountMax 3
           EOF
           chmod 644 ~/.ssh/config
 
-      - name: 启动反向SOCKS隧道
+      - name: 启动【正向+精准反向】SOCKS隧道
         run: |
-          ssh -Nf -D 9999 -R 10800:127.0.0.1:9999 tunnel
-          echo "隧道就绪，腾讯云代理地址 socks5h://127.0.0.1:10800"
-          sleep 21600
+          # -D 9999 ：GitHub本机海外SOCKS（出口GitHub美国IP）
+          # -R 127.0.0.1:10800:127.0.0.1:9999 ：强制映射到腾讯云本地10800
+          ssh -N \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=3 \
+            -o ExitOnForwardFailure=yes \
+            -D 9999 \
+            -R 127.0.0.1:10800:127.0.0.1:9999 \
+            tunnel &
+
+          sleep 3
+          echo "✅ 隧道启动成功！"
+          echo "👉 腾讯云代理地址：socks5://127.0.0.1:10800"
+          echo "🌐 出口IP为 GitHub Action 海外机房IP"
+          
+          # 前台挂起保活6小时（替代sleep，更稳定）
+          timeout 21600 sleep 99999
